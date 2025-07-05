@@ -33,17 +33,24 @@ class Wallet{
         for (let i = chain.length - 1; i > 0; i--) {
             const block = chain[i];
 
-            for (let transaction of block.data) {
-                if (transaction.input.address === address) {
-                    hasConductedTransaction = true;
-                }
+            // Check if block.data is an array of transactions
+            if (Array.isArray(block.data)) {
+                for (let transaction of block.data) {
+                    // Ensure transaction has the expected structure
+                    if (transaction && transaction.input && transaction.outputMap) {
+                        if (transaction.input.address === address) {
+                            hasConductedTransaction = true;
+                        }
 
-                const addressOutput = transaction.outputMap[address];
+                        const addressOutput = transaction.outputMap[address];
 
-                if (addressOutput) {
-                    outputsTotal = outputsTotal + addressOutput;
+                        if (addressOutput) {
+                            outputsTotal = outputsTotal + addressOutput;
+                        }
+                    }
                 }
             }
+            // If block.data is not an array (e.g., custom data from mining), skip this block
 
             if (hasConductedTransaction) {
                 break;
